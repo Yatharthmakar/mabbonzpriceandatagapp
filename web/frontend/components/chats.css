@@ -1,0 +1,17 @@
+.messagebox-admin {
+    width: 80%;
+    padding: 2%;
+    margin: 2%;
+    background-color: wheat;
+    border-radius: 10px;
+}
+
+.box {
+    height: 370px;
+    margin-top: 15px;
+    overflow: auto;
+}
+
+.adminIcon {
+    width: 15%;
+}

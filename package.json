@@ -1,0 +1,31 @@
+{
+  "name": "yashapp",
+  "version": "1.0.0",
+  "main": "web/index.js",
+  "license": "UNLICENSED",
+  "scripts": {
+    "shopify": "shopify",
+    "build": "shopify app build",
+    "dev": "shopify app dev",
+    "info": "shopify app info",
+    "generate": "shopify app generate",
+    "deploy": "shopify app deploy"
+  },
+  "dependencies": {
+    "@shopify/app": "^3.48.0",
+    "@shopify/cli": "^3.48.0",
+    "axios": "^1.4.0",
+    "jsonl-parse-stringify": "^1.0.3",
+    "mongodb": "^5.7.0",
+    "papaparse": "^5.4.1",
+    "react-router-dom": "^6.14.0",
+    "readline": "^1.3.0"
+  },
+  "author": "Yatharth",
+  "private": true,
+  "workspaces": [
+    "web",
+    "web/frontend",
+    "extensions/*"
+  ]
+}
