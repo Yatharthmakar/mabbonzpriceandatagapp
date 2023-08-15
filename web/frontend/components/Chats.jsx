@@ -81,7 +81,7 @@ export default function Chats() {
     return (
         <Page narrowWidth title='Chat with app Admin'>
             {loadingMarkup}
-            {!isLoading && <LegacyCard  actions={[{content: 'Refresh Chats', onAction: getChats}]}>
+            {!isLoading && <LegacyCard actions={[{ content: 'Refresh Chats', onAction: getChats }]}>
                 <div className='box' ref={chatWindowRef}>
                     {messages?.map((message) => {
                         return (
@@ -102,6 +102,9 @@ export default function Chats() {
                 </div>
                 <TextField value={messageValue} onChange={handleTextFieldChange} autoComplete="off" placeholder="Message" focused='true' connectedRight={<Button onClick={handleSubmit}>Send</Button>} />
             </LegacyCard>}
+            <div className='info-box'>
+                <p>For more details on configuration help, visit our <a href='https://www.mabbonz.com/mabbonz-tags-prices-app/'> documentation</a>.</p>
+            </div>
         </Page>
     )
 }

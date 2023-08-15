@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useState, useCallback } from 'react';
-import { Page, Button, LegacyCard, ButtonGroup, Loading, Frame } from "@shopify/polaris";
+import { Page, Button, LegacyCard, ButtonGroup, Loading, Frame, Icon, Text } from "@shopify/polaris";
 import { useAuthenticatedFetch } from '../hooks';
+import { CircleInformationMajor } from '@shopify/polaris-icons';
 import TagUpdate from './TagUpdate';
 import PriceUpdate from './PriceUpdate';
+import '../components/chats.css';
 
 export default function Home() {
 
@@ -48,13 +50,13 @@ export default function Home() {
   ) : null;
 
   return (
-    <Page fullWidth title="Price Tag Updator App">
+    <Page fullWidth title="Update Tags and Prices">
       {loadingMarkup}
-      {!isLoading && <LegacyCard title="Update" sectioned>
+      {!isLoading && <LegacyCard title="Choose" sectioned>
         <ButtonGroup fullWidth="true" >
           <div style={{ display: "flex", justifyContent: "space-evenly" }}>
             <div style={{ width: '30%' }}>
-              <Button pressed={activeButtonIndex === 0} onClick={() => handleButtonClick(0)}>Upadate Tags</Button>
+              <Button pressed={activeButtonIndex === 0} onClick={() => handleButtonClick(0)}>Update Tags</Button>
             </div>
             <div style={{ width: '30%' }}>
               <Button pressed={activeButtonIndex === 1} onClick={() => handleButtonClick(1)}>Update Price</Button>
@@ -64,6 +66,10 @@ export default function Home() {
         {activeButtonIndex === 0 && <TagUpdate />}
         {activeButtonIndex === 1 && <PriceUpdate />}
       </LegacyCard>}
+
+      <div className='info-box'>
+        <p>For more details on configuration help, visit our <a href='https://www.mabbonz.com/mabbonz-tags-prices-app/'> documentation</a>.</p>
+      </div>
     </Page>
   )
 }

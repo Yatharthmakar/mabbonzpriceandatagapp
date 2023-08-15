@@ -2,7 +2,7 @@
     width: 80%;
     padding: 2%;
     margin: 2%;
-    background-color: wheat;
+    background-color: #f3f3f3;
     border-radius: 10px;
 }
 
@@ -14,4 +14,10 @@
 
 .adminIcon {
     width: 15%;
+}
+
+.info-box{
+    padding-top: 20px;
+    padding-bottom: 10px;
+    text-align: center;
 }
