@@ -55,7 +55,6 @@ app.get("/api/fetchStoreData", async (_req, res) => {
   try {
     const storeData = await shopify.api.rest.Shop.all({ session: res.locals.shopify.session, });
     await insertUserData(storeData.data[0]);
-    await updateRunning({ "store_name": storeData.data[0].name, "running": 0 });
     // console.log("store info", storeData.data);
     res.status(200).send({ data: storeData.data[0].name });
   }

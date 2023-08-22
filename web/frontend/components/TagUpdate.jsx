@@ -58,7 +58,7 @@ export default function TagUpdate() {
         <LegacyStack alignment="center" distribution='center'>
             <div style={{ width: 114, height: 114, margin: '30px' }}>
                 <DropZone allowMultiple={false} accept=".csv" onDrop={handleDropZoneDrop}>
-                    {!file && <DropZone.FileUpload actionHint="Accepts .csv File only." />}
+                    {!file && <DropZone.FileUpload actionHint="Accepts .csv File only. 2000 SKU limit" />}
                     {uploadedFile}
                 </DropZone>
             </div>
@@ -100,6 +100,7 @@ export default function TagUpdate() {
             },
         });
         const result = await response.json();
+        console.log("running",result);
 
         if (!result) {
             let csvDataUplaod = [];
@@ -161,7 +162,7 @@ export default function TagUpdate() {
                 <RadioButton label="Replace a specific tag with another tag from all products" disabled={file} checked={radioValue === 'replacefromall'} id="replacefromall" onChange={handleRadioChange} />
                 <RadioButton label="Add tags to existing tags through SKU" disabled={file} checked={radioValue === 'addtags'} id="addtags" onChange={handleRadioChange} />
                 <RadioButton label="Delete all tags through SKU" disabled={file} checked={radioValue === 'deleteallfromsku'} id="deleteallfromsku" onChange={handleRadioChange} />
-                <RadioButton label="Delete a specific tag from all products" disabled={file} checked={radioValue === 'deletetagfromall'} id="deletetagfromall" onChange={handleRadioChange} />
+                <RadioButton label="Delete a specific tag from all products (Upload a single column CSV)" disabled={file} checked={radioValue === 'deletetagfromall'} id="deletetagfromall" onChange={handleRadioChange} />
 
             </VerticalStack>
             {radioValue && uploadSection}

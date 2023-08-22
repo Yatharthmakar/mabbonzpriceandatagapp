@@ -103,7 +103,7 @@ export default function Chats() {
                 <TextField value={messageValue} onChange={handleTextFieldChange} autoComplete="off" placeholder="Message" focused='true' connectedRight={<Button onClick={handleSubmit}>Send</Button>} />
             </LegacyCard>}
             <div className='info-box'>
-                <p>For more details on configuration help, visit our <a href='https://www.mabbonz.com/mabbonz-tags-prices-app/'> documentation</a>.</p>
+                <p>For more details on configuration help, visit our <a target="_blank" href='https://www.mabbonz.com/mabbonz-tags-prices-app/'> documentation</a>.</p>
             </div>
         </Page>
     )

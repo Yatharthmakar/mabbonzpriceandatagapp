@@ -60,7 +60,7 @@ export default function PriceUpdate() {
     <LegacyStack alignment="center" distribution='center'>
       <div style={{ width: 114, height: 114, margin: '30px' }}>
         <DropZone allowMultiple={false} accept=".csv" onDrop={handleDropZoneDrop}>
-          {!file && <DropZone.FileUpload actionHint="Accepts .csv File only." />}
+          {!file && <DropZone.FileUpload actionHint="Accepts .csv File only. 2000 SKU limit" />}
           {uploadedFile}
         </DropZone>
       </div>
@@ -169,7 +169,7 @@ export default function PriceUpdate() {
           </LegacyStack>}
         </LegacyStack>
         <LegacyStack alignment="center" wrap={false}>
-          <RadioButton label="Update decresed price" disabled={amountValue || percentageValue || file} checked={radioValue === 'decreseprice'} id="decreseprice" onChange={handleRadioChange} />
+          <RadioButton label="Update decreased price" disabled={amountValue || percentageValue || file} checked={radioValue === 'decreseprice'} id="decreseprice" onChange={handleRadioChange} />
           {radioValue === 'decreseprice' && <LegacyStack wrap={false} alignment="center">
             <Text>By</Text>
             <TextField type="number" disabled={percentageValue} value={amountValue} onChange={handleAmountChange} autoComplete="off" />

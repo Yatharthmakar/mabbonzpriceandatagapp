@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useState, useCallback } from 'react';
 import { Page, Button, LegacyCard, ButtonGroup, Loading, Frame, Icon, Text } from "@shopify/polaris";
 import { useAuthenticatedFetch } from '../hooks';
-import { CircleInformationMajor } from '@shopify/polaris-icons';
 import TagUpdate from './TagUpdate';
 import PriceUpdate from './PriceUpdate';
 import '../components/chats.css';
@@ -68,7 +67,7 @@ export default function Home() {
       </LegacyCard>}
 
       <div className='info-box'>
-        <p>For more details on configuration help, visit our <a href='https://www.mabbonz.com/mabbonz-tags-prices-app/'> documentation</a>.</p>
+        <p>For more details on configuration help, visit our <a target="_blank" href='https://www.mabbonz.com/mabbonz-tags-prices-app/'> documentation</a>.</p>
       </div>
     </Page>
   )

@@ -95,7 +95,7 @@ export default function SelectedLog(props) {
                 /></div>
             </LegacyCard>}
             <div className='info-box'>
-                <p>For more details on configuration help, visit our <a href='https://www.mabbonz.com/mabbonz-tags-prices-app/'> documentation</a>.</p>
+                <p>For more details on configuration help, visit our <a target="_blank" href='https://www.mabbonz.com/mabbonz-tags-prices-app/'> documentation</a>.</p>
             </div>
         </Page>
     )

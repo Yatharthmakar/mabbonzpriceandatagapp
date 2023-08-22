@@ -5,7 +5,7 @@ import {setSkuMap} from "./dbConnection.js";
 // import JSONL from "jsonl-parse-stringify";
 
 let map = {};
-
+let products_sku={};
 export default async function productFetchor(session, storeName){
 
     const client = new shopify.api.clients.Graphql({ session });
@@ -20,6 +20,7 @@ export default async function productFetchor(session, storeName){
                   edges {
                     node {
                       id
+                      tags
                       variants {
                         edges{
                             node{
@@ -101,6 +102,7 @@ async function skuMatch(url,storeName){
                 }
                 else{
                     previous = {"id": `${lin.id}`};
+                    products_sku[`${lin.id}`] = {"tags": `${lin.tags}`, "id": `${lin.id}`}
                 }
             }
         });
@@ -110,7 +112,7 @@ async function skuMatch(url,storeName){
         throw error;
       }
 
-      setSkuMap(map, storeName);
+      setSkuMap(map, products_sku, storeName);
       return map;
 }
 

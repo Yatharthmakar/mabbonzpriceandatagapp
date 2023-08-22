@@ -1,12 +1,12 @@
 import shopify from "../shopify.js";
 import { GraphqlQueryError } from "@shopify/shopify-api";
-import { updateStatus, updateRunning, getSkuMap } from "./dbConnection.js";
+import { updateStatus, updateRunning, getSkuMap, getProductMap } from "./dbConnection.js";
 import currentDate from "./formated-date.js";
 
 export default async function productTagUpdate(session, req) {
   console.log('Tag Update', req.storeName);
   const client = new shopify.api.clients.Graphql({ session });
-  const time = currentDate();
+  const time = currentDate(); 
   let count = 0;
   let error = false;
   let errorCount = 1;
@@ -76,10 +76,10 @@ export default async function productTagUpdate(session, req) {
       await updateRunning({"store_name": req.storeName, "running": 0});
     }
     else if (req.update === "deletetagfromall") {
-      for (let key in skuMap) {
-        for await (const product of products) {
+      const productMap = await getProductMap(req.storeName);
+      for await (const product of products){
+        for (let key in productMap){
           errorCount++;
-          let prod = skuMap[key].product;
           if (product.data) {
             await updateStatus({ "store_name": req.storeName, "start_time": time, "error": `Tag not found!! at line ${errorCount}` });
             error = true;
@@ -87,10 +87,11 @@ export default async function productTagUpdate(session, req) {
           } else {
             count++;
           }
+          let prod = productMap[key];
           if (prod.tags.includes(product.data)) {
             const data = await client.query({
               data: `mutation {
-                  tagsRemove(id: "${prod.id}", tags: "${product.data}") {
+                  tagsRemove(id: "${key}", tags: "${product.data}") {
                             node {
                               id
                             }
@@ -104,10 +105,10 @@ export default async function productTagUpdate(session, req) {
       await updateRunning({"store_name": req.storeName, "running": 0});
     }
     else if (req.update === "replacefromall") {
-      for (let key in skuMap) {
-        for await (const product of products) {
+      const productMap = await getProductMap(req.storeName);
+      for await (const product of products){
+        for (let key in productMap){
           errorCount++;
-          let prod = skuMap[key].product;
           if (!product.oldtags || !product.tags || product.tags=== '' || product.oldtags === '') {
             await updateStatus({ "store_name": req.storeName, "start_time": time, "error": `Tag not found!! at line ${errorCount}` });
             error = true;
@@ -115,10 +116,11 @@ export default async function productTagUpdate(session, req) {
           } else {
             count++;
           }
+          let prod = productMap[key];
           if (prod.tags.includes(product.oldtags)) {
             const data = await client.query({
               data: `mutation {
-                  tagsRemove(id: "${prod.id}", tags: "${product.oldtags}") {
+                  tagsRemove(id: "${key}", tags: "${product.oldtags}") {
                             node {
                               id
                             }
@@ -127,7 +129,7 @@ export default async function productTagUpdate(session, req) {
             });
             const data1 = await client.query({
               data: `mutation {
-                  tagsAdd(id: "${prod.id}", tags: "${product.tags}") {
+                  tagsAdd(id: "${key}", tags: "${product.tags}") {
                             node {
                               id
                             }

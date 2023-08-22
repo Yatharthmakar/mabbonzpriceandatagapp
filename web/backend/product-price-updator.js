@@ -28,22 +28,23 @@ export default async function productPriceUpdate(session, req) {
   let error = false;
   let errorCount = 1;
   const skuMap = await getSkuMap(req.storeName);
-  await updateRunning({"store_name": req.storeName, "running": 1});
+  await updateRunning({ "store_name": req.storeName, "running": 1 });
   await updateStatus({ "store_name": req.storeName, "file_name": req.file.name, "start_time": time, "update": "Price Update", "count": 0 });
   try {
     const products = req.file.data;
     const amount = Number(req.amount);
     const percentage = Number(req.percentage);
+    let coun =0;
     for await (const product of products) {
-      
+
       let variant = skuMap[`${product.sku}`];
       let price = Number(product.price);
       if (!variant) {
         await updateStatus({ "store_name": req.storeName, "start_time": time, "error": `SKU not found!! at line ${errorCount++}` });
         error = true;
         continue;
-      } 
-      else if(!price){
+      }
+      else if (!price) {
         await updateStatus({ "store_name": req.storeName, "start_time": time, "error": `Price not founcd !! at line ${errorCount++}. Price must be a numeric value!!` });
         error = true;
         continue;
@@ -56,14 +57,14 @@ export default async function productPriceUpdate(session, req) {
         if (req.amount) {
           price += amount;
         } else {
-          price = price + price * percentage / 100;
+          price += price * percentage / 100;
         }
       }
       else if (req.update === "decreseprice") {
         if (req.amount) {
           price -= amount;
         } else {
-          price = price - price * percentage / 100;
+          price -= price * percentage / 100;
         }
       }
       const data = await client.query({
@@ -79,7 +80,7 @@ export default async function productPriceUpdate(session, req) {
       });
     };
     await updateStatus({ "store_name": req.storeName, "start_time": time, "count": count, "status": error ? 'Some Fields Ignored' : 'Success' });
-    await updateRunning({"store_name": req.storeName, "running": 0});
+    await updateRunning({ "store_name": req.storeName, "running": 0 });
   }
 
   catch (error) {

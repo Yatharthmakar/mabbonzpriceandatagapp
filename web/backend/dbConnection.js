@@ -32,20 +32,20 @@ const updateUninstall = async(storeName)=>{
     await db.updateOne({ "store_data.domain": storeName }, { $set: { uninstalled_at: currentDate() } });
 }
 
-const setSkuMap = async (data, storeName) => {
+const setSkuMap = async (data, productSku, storeName) => {
     const db = await insertProductData();
     const db2 = await insertLogData();
     const db3 = await chats();
     const response = await db.find({ "name": storeName }).toArray();
     try {
         if (response.length === 0) {
-            await db.insertOne({ "name": storeName, "sku_map": data, "running": 0 });
+            await db.insertOne({ "name": storeName, "sku_map": data, "product_sku": productSku, "running": 0 });
             await db2.insertOne({ "name": storeName, "logs": [] });
             await db3.insertOne({ "name": storeName, "chats": []});
             console.log("Data Inserted");
         }
         else {
-            await db.updateOne({ "name": storeName }, { $set: { "sku_map": data } })
+            await db.updateOne({ "name": storeName }, { $set: { "sku_map": data, "product_sku": productSku} })
             console.log("Data Updated", storeName);
         }
     }
@@ -67,6 +67,7 @@ const setChats = async(data) => {
 
 const updateRunning = async (data) => {
     try {
+        console.log("running update", data.running, data.store_name);
         const db = await insertProductData();
         await db.updateOne({ "name": data.store_name }, { $set: { "running": data.running } });
     }
@@ -91,7 +92,7 @@ const updateStatus = async (data) => {
     try {
         const response = await db.find({ "name": data.store_name, "logs.start_time": data.start_time }).toArray();
         if (response.length === 0) {
-            console.log("inserted file status"), data.store_name;
+            console.log("inserted file status", data.store_name);
             await db.updateOne({ "name": data.store_name }, { $push: { "logs": { $each: [{ "start_time": data.start_time, "finish_time": "Running", "file_name": data.file_name, "status": "Pending", "update": data.update, "count": data.count, "error": { "count": 0, "message": [] } }], $position: 0 } } });
         }
         else if (data.error) {
@@ -135,6 +136,13 @@ const getSkuMap = async (storeName) => {
     return response[0].sku_map;
 };
 
+const getProductMap = async (storeName) => {
+    const db = await insertProductData();
+    const response = await db.find({ "name": storeName }).toArray();
+    console.log('Fetched from database', storeName);
+    return response[0].product_sku;
+};
+
 const insertUserData = async (data) => {
     const db = await userData();
     const response = await db.find({ "store_data": data }).toArray();
@@ -145,4 +153,4 @@ const insertUserData = async (data) => {
     }
 };
 
-export { insertUserData, setSkuMap, getSkuMap, updateStatus, getLogs, deleteLogs, deleteLog, updateRunning, getRunning, updateUninstall, getChats, setChats };
+export { insertUserData, setSkuMap, getSkuMap, getProductMap, updateStatus, getLogs, deleteLogs, deleteLog, updateRunning, getRunning, updateUninstall, getChats, setChats };
