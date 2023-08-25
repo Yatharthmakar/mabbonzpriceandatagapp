@@ -27,7 +27,7 @@ async function chats() {
     return db.collection('chats');
 };
 
-const updateUninstall = async(storeName)=>{
+const updateUninstall = async (storeName) => {
     const db = await userData();
     await db.updateOne({ "store_data.domain": storeName }, { $set: { uninstalled_at: currentDate() } });
 }
@@ -41,11 +41,11 @@ const setSkuMap = async (data, productSku, storeName) => {
         if (response.length === 0) {
             await db.insertOne({ "name": storeName, "sku_map": data, "product_sku": productSku, "running": 0 });
             await db2.insertOne({ "name": storeName, "logs": [] });
-            await db3.insertOne({ "name": storeName, "chats": []});
+            await db3.insertOne({ "name": storeName, "chats": [] });
             console.log("Data Inserted");
         }
         else {
-            await db.updateOne({ "name": storeName }, { $set: { "sku_map": data, "product_sku": productSku} })
+            await db.updateOne({ "name": storeName }, { $set: { "sku_map": data, "product_sku": productSku } })
             console.log("Data Updated", storeName);
         }
     }
@@ -54,15 +54,19 @@ const setSkuMap = async (data, productSku, storeName) => {
     }
 };
 
-const getChats = async(storeName) => {
+const getChats = async (session) => {
+    const storeName = session.shop.replace('.myshopify.com','');
+    console.log("get chats", storeName);
     const db = await chats();
     const response = await db.find({ "name": storeName }).toArray();
     return response[0].chats;
 };
 
-const setChats = async(data) => {
+const setChats = async (data, session) => {
+    const storeName = session.shop.replace('.myshopify.com','');
+    console.log("set chats", storeName);
     const db = await chats();
-    await db.updateOne({ "name": data.storeName }, { $push: {"chats": {"message": data.message, "time": currentDate(), "sender": data.storeName}} });
+    await db.updateOne({ "name": storeName }, { $push: { "chats": { "message": data.message, "time": currentDate(), "sender": storeName } } });
 };
 
 const updateRunning = async (data) => {
@@ -76,13 +80,15 @@ const updateRunning = async (data) => {
     }
 }
 
-const getRunning = async (data)=>{
-    try{
+const getRunning = async (session) => {
+    try {
+        const storeName = session.shop.replace('.myshopify.com', '');
+        console.log("get running status", storeName);
         const db = await insertProductData();
-        const response = await db.find({ "name": data }).toArray();
+        const response = await db.find({ "name": storeName }).toArray();
         return response[0].running;
     }
-    catch(err){
+    catch (err) {
         console.log(err);
     }
 }
@@ -108,9 +114,12 @@ const updateStatus = async (data) => {
     }
 };
 
-const deleteLog = async (data, storeName) => {
-    const db = await insertLogData();
+const deleteLog = async (data, session) => {
     try {
+        const storeName = session.shop.replace('.myshopify.com', '');
+        console.log('Deleted single Logs', storeName);
+        const db = await insertLogData();
+
         await db.updateOne({ "name": storeName }, { $pull: { "logs": { "start_time": data } } });
     }
     catch (err) {
@@ -118,15 +127,19 @@ const deleteLog = async (data, storeName) => {
     }
 };
 
-const getLogs = async (data) => {
+const getLogs = async (session) => {
+    const storeName = session.shop.replace('.myshopify.com', '');
+    console.log('Logs fetch refresh', storeName);
     const db = await insertLogData();
-    const response = await db.find({ "name": data, }, { "logs": 1 }).toArray();
+    const response = await db.find({ "name": storeName, }, { "logs": 1 }).toArray();
     return response;
 };
 
-const deleteLogs = async (data) => {
+const deleteLogs = async (session) => {
+    const storeName = session.shop.replace('.myshopify.com', '');
+    console.log('Deleted All Logs', storeName);
     const db = await insertLogData();
-    await db.updateOne({ "name": data }, { $set: { "logs": [] } });
+    await db.updateOne({ "name": storeName }, { $set: { "logs": [] } });
 };
 
 const getSkuMap = async (storeName) => {
@@ -145,11 +158,13 @@ const getProductMap = async (storeName) => {
 
 const insertUserData = async (data) => {
     const db = await userData();
-    const response = await db.find({ "store_data": data }).toArray();
+    const response = await db.find({ "store_data.name": data.name }).toArray();
     if (response.length === 0) {
+        console.log("inserted user data", data.name);
         await db.insertOne({ "store_data": data, "installed_at": currentDate(), "last_used": currentDate(), "uninstalled_at": "-" });
     } else {
-        await db.updateOne({ "store_data": data }, { $set: { last_used: currentDate(), "uninstalled_at": "-" } });
+        console.log("updated user data", data.name);
+        await db.updateOne({ "store_data.name": data.name }, { $set: { last_used: currentDate(), "uninstalled_at": "-" } });
     }
 };
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import { Page, EmptyState, ResourceItem, ResourceList, Frame, Loading, Button, Thumbnail, Text, LegacyCard } from "@shopify/polaris";
-import { PauseMajor, StatusActiveMajor } from '@shopify/polaris-icons';
+import { PauseMajor, StatusActiveMajor, CircleDisableMinor } from '@shopify/polaris-icons';
 import { useAuthenticatedFetch } from '../hooks';
 import '../components/chats.css';
 
@@ -16,13 +16,7 @@ export default function LogsDisplay(props) {
 
     const refreshLogs = async () => {
         setIsLoading(true);
-        const response = await fetchh('/api/fetchLogsRefresh', {
-            method: 'post',
-            body: JSON.stringify({ "storeName": localStorage.getItem("storeName") }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await fetchh('/api/fetchLogsRefresh');
         const refresData = await response.json();
         setAllLogsData(refresData);
         setLogsData(refresData.slice(0, 3));
@@ -39,12 +33,8 @@ export default function LogsDisplay(props) {
 
     const deleteLogs = async () => {
         setIsLoading(true);
-        const response = await fetchh('/api/deleteLogs', {
-            method: 'delete',
-            body: JSON.stringify({ "storeName": localStorage.getItem("storeName") }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
+        const response = await fetchh('/api/deleteLogs',{
+            method: 'DELETE'
         });
         await refreshLogs();
         setAllLogsData([]);
@@ -87,7 +77,11 @@ export default function LogsDisplay(props) {
                                 ]
                                 : null;
 
-                            if (status !== "Pending") {
+                            if (status === "Failed") {
+                                textColor = "critical";
+                                tuhmbNail = CircleDisableMinor;
+                                
+                            }else if(status !== "Pending"){
                                 textColor = "success";
                                 tuhmbNail = StatusActiveMajor;
                             }

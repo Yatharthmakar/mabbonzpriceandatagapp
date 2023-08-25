@@ -15,13 +15,7 @@ export default function Chats() {
     const getChats = async () => {
 
         setIsLoading(true);
-        const response = await fetchh("/api/getChats", {
-            method: 'post',
-            body: JSON.stringify({ "storeName": localStorage.getItem("storeName") }),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
+        const response = await fetchh("/api/getChats");
         const result = await response.json();
         setMessages(result);
 
@@ -51,19 +45,13 @@ export default function Chats() {
         setIsLoading(true);
         await fetchh("/api/setChats", {
             method: 'post',
-            body: JSON.stringify({ "storeName": localStorage.getItem("storeName"), "message": messageValue }),
+            body: JSON.stringify({ "message": messageValue }),
             headers: {
                 'Content-Type': 'application/json'
             },
         });
 
-        const response = await fetchh("/api/getChats", {
-            method: 'post',
-            body: JSON.stringify({ "storeName": localStorage.getItem("storeName") }),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
+        const response = await fetchh("/api/getChats");
         const result = await response.json();
         setMessages(result);
         setMessageValue('');

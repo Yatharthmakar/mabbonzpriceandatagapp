@@ -19,13 +19,7 @@ export default function SelectedLog(props) {
 
     const get = async () => {
         setIsLoading(true);
-        const response = await fetchh('/api/fetchLogsRefresh', {
-            method: 'post',
-            body: JSON.stringify({ "storeName": localStorage.getItem("storeName") }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await fetchh('/api/fetchLogsRefresh');
         const refresData = await response.json();
         const logDetail = props.searchParams.get('log');
 
@@ -42,7 +36,7 @@ export default function SelectedLog(props) {
         const request = await fetchh("/api/deleteLog", {
             method: 'delete',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ "start_time": log.start_time, "storeName": localStorage.getItem("storeName") })
+            body: JSON.stringify({ "start_time": log.start_time })
         });
         setTimeout(() => {
             navigate('/logs');
@@ -85,7 +79,7 @@ export default function SelectedLog(props) {
                                         </ResourceItem>
                                     );
                                 }}
-                            /> : <Text variant="bodyMd">No errors</Text>
+                            /> : log.status === 'Failed'? <Text variant="bodyMd">Failed</Text>: <Text variant="bodyMd">No errors</Text>
                         },
                         {
                             term: <Text variant="bodyMd" fontWeight="bold">{log.start_time.substring(0, 19)}</Text>,

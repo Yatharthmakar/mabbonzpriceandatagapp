@@ -53,19 +53,19 @@ app.use(express.json());
 
 app.get("/api/fetchStoreData", async (_req, res) => {
   try {
-    const storeData = await shopify.api.rest.Shop.all({ session: res.locals.shopify.session, });
+    const storeData = await shopify.api.rest.Shop.all({ session: res.locals.shopify.session });
     await insertUserData(storeData.data[0]);
     // console.log("store info", storeData.data);
-    res.status(200).send({ data: storeData.data[0].name });
+    res.status(200).send({ "response": "Success" });
   }
   catch (err) {
     console.log("Store Data Fecth error", err);
   }
 });
 
-app.post("/api/productFetch", async (req, res) => {
+app.get("/api/productFetch", async (req, res) => {
   try {
-    const response = await productFetchor(res.locals.shopify.session, req.body.storeName);
+    const response = await productFetchor(res.locals.shopify.session);
   }
   catch (err) {
     console.log(err);
@@ -89,17 +89,17 @@ app.patch("/api/updatePriceProduct", async (_req, res) => {
     console.log("Price Update Fail", err);
   }
   res.status(200).send({ "response": "Success" });
+
 });
 
-app.post("/api/getRunningstatus", async (_req, res) => {
-  const response = await getRunning(_req.body.storeName);
+app.get("/api/getRunningstatus", async (_req, res) => {
+  const response = await getRunning(res.locals.shopify.session);
   res.json(response);
 });
 
-app.post("/api/fetchLogsRefresh", async (_req, res) => {
+app.get("/api/fetchLogsRefresh", async (_req, res) => {
   try {
-    const response = await getLogs(_req.body.storeName);
-    console.log('Logs fetch refresh', _req.body.storeName);
+    const response = await getLogs(res.locals.shopify.session);
     res.json(response[0].logs);
   }
   catch (err) {
@@ -109,8 +109,7 @@ app.post("/api/fetchLogsRefresh", async (_req, res) => {
 
 app.delete("/api/deleteLogs", async (_req, res) => {
   try {
-    console.log('Deleted All Logs', _req.body.storeName);
-    deleteLogs(_req.body.storeName);
+    deleteLogs(res.locals.shopify.session);
     res.sendStatus(200);
   }
   catch (err) {
@@ -120,8 +119,7 @@ app.delete("/api/deleteLogs", async (_req, res) => {
 
 app.delete("/api/deleteLog", async (_req, res) => {
   try {
-    console.log("Deleted Log", _req.body.storeName);
-    deleteLog(_req.body.start_time, _req.body.storeName);
+    deleteLog(_req.body.start_time, res.locals.shopify.session);
     res.sendStatus(200);
   }
   catch (err) {
@@ -129,9 +127,9 @@ app.delete("/api/deleteLog", async (_req, res) => {
   }
 });
 
-app.post("/api/getChats", async (req, res) => {
+app.get("/api/getChats", async (req, res) => {
   try {
-    const response = await getChats(req.body.storeName);
+    const response = await getChats(res.locals.shopify.session);
     res.json(response);
   }
   catch (err) {
@@ -141,7 +139,7 @@ app.post("/api/getChats", async (req, res) => {
 
 app.post("/api/setChats", async (req, res) => {
   try {
-    const response = await setChats(req.body);
+    const response = await setChats(req.body, res.locals.shopify.session);
     res.send({ "response": "Success" });
   }
   catch (err) {

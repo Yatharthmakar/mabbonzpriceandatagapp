@@ -6,10 +6,9 @@ import {setSkuMap} from "./dbConnection.js";
 
 let map = {};
 let products_sku={};
-export default async function productFetchor(session, storeName){
-
-    const client = new shopify.api.clients.Graphql({ session });
+export default async function productFetchor(session){
     try{
+        const storeName = session.shop.replace('.myshopify.com','');
         const client = new shopify.api.clients.Graphql({ session });
         const response = await client.query({
         data: `mutation {

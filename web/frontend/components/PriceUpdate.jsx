@@ -12,6 +12,7 @@ export default function PriceUpdate() {
   const navigate = useNavigate();
   const fetchh = useAuthenticatedFetch();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [radioValue, setRadioValue] = useState('');
   const [file, setFile] = useState();
   const [csvData, setCsvData] = useState();
@@ -94,13 +95,8 @@ export default function PriceUpdate() {
   );
 
   const handleSubmit = async () => {
-    const response = await fetchh('/api/getRunningstatus', {
-      method: 'post',
-      body: JSON.stringify({ "storeName": localStorage.getItem("storeName") }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    setIsLoading(true);
+    const response = await fetchh('/api/getRunningstatus');
     const result = await response.json();
 
     if (!result) {
@@ -123,7 +119,7 @@ export default function PriceUpdate() {
         complete: async (results) => {
           const result = await fetchh('/api/updatePriceProduct', {
             method: 'PATCH',
-            body: JSON.stringify({ "file": { "data": results.data, "name": file.name }, "update": radioValue, "amount": amountValue, "percentage": percentageValue, "storeName": localStorage.getItem("storeName") }),
+            body: JSON.stringify({ "file": { "data": results.data, "name": file.name }, "update": radioValue, "amount": amountValue, "percentage": percentageValue }),
             headers: {
               'Content-Type': 'application/json',
             },
@@ -135,11 +131,12 @@ export default function PriceUpdate() {
     else {
       setErrorMessage("Process running in background please wait!");
     }
+    setIsLoading(false);
   };
 
   const submitButton = (
     <div style={{ textAlign: "-webkit-center", margin: "20px" }}>
-      <Button primary onClick={handleSubmit}>Submit</Button>
+      <Button loading= {isLoading} primary onClick={handleSubmit}>Submit</Button>
       <Text variant="headingMd" color="critical">{errorMessage}</Text>
     </div>
   )

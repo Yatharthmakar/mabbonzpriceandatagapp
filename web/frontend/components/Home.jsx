@@ -17,17 +17,8 @@ export default function Home() {
     const fecthdata = async () => {
       setIsLoading(true);
       const response = await fetchh("/api/fetchStoreData");
-      const result = await response.json();
 
-      localStorage.setItem("storeName", result.data);
-
-      const responsesku = await fetchh("/api/productFetch", {
-        method: 'post',
-        body: JSON.stringify({ "storeName": localStorage.getItem("storeName") }),
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      });
+      const responsesku = await fetchh("/api/productFetch");
       setIsLoading(false);
     }
     fecthdata();
