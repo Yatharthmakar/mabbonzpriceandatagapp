@@ -119,7 +119,7 @@ export default function PriceUpdate() {
         complete: async (results) => {
           const result = await fetchh('/api/updatePriceProduct', {
             method: 'PATCH',
-            body: JSON.stringify({ "file": { "data": results.data, "name": file.name }, "update": radioValue, "amount": amountValue, "percentage": percentageValue }),
+            body: JSON.stringify({ "file": { "data": results.data, "name": file.name }, "update": radioValue, "amount": amountValue, "percentage": percentageValue, "timezone": new Date().getTimezoneOffset() }),
             headers: {
               'Content-Type': 'application/json',
             },

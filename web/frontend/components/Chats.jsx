@@ -45,7 +45,7 @@ export default function Chats() {
         setIsLoading(true);
         await fetchh("/api/setChats", {
             method: 'post',
-            body: JSON.stringify({ "message": messageValue }),
+            body: JSON.stringify({ "message": messageValue, "timezone": new Date().getTimezoneOffset() }),
             headers: {
                 'Content-Type': 'application/json'
             },

@@ -23,7 +23,7 @@ export default async function productPriceUpdate(session, req) {
   const storeName = session.shop.replace('.myshopify.com', '');
   console.log('Price Update', storeName);
   const client = new shopify.api.clients.Graphql({ session });
-  const time = currentDate();
+  const time = currentDate(req.timezone);
   let count = 0;
   let error = false;
   let errorCount = 1;
@@ -32,12 +32,13 @@ export default async function productPriceUpdate(session, req) {
   await updateStatus({ "store_name": storeName, "file_name": req.file.name, "start_time": time, "update": "Price Update", "count": 0 });
   try {
     const products = req.file.data;
-    const amount = Number(req.amount);
-    const percentage = Number(req.percentage);
+    const amount = Math.abs(Number(req.amount));
+    const percentage = Math.abs(Number(req.percentage));
     for await (const product of products) {
       if (product.sku != '' && product.price != '') {
         errorCount++;
-        const variant = skuMap[`${product.sku}`];
+        const prod_sku = product.sku.replace(/^'/,"");
+        const variant = skuMap[`${prod_sku}`];
         let price = Number(product.price);
         if (!variant) {
           await updateStatus({ "store_name": storeName, "start_time": time, "error": `SKU not found or wrong SKU at line ${errorCount} ` });
@@ -80,13 +81,13 @@ export default async function productPriceUpdate(session, req) {
         });
       }
     };
-    await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "status": error ? 'Some Fields Ignored' : 'Success' });
+    await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "finish_time": currentDate(req.timezone), "status": error ? 'Some Fields Ignored' : 'Success' });
     await updateRunning({ "store_name": storeName, "running": 0 });
   }
 
   catch (error) {
     console.log("product-price-updator.js", error);
-    await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "status": 'Failed' });
+    await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "finish_time": currentDate(req.timezone), "status": 'Failed' });
     await updateRunning({ "store_name": storeName, "running": 0 });
   }
 }

@@ -7,7 +7,7 @@ export default async function productTagUpdate(session, req) {
   const storeName = session.shop.replace('.myshopify.com',''); 
   console.log('Tag Update', storeName);
   const client = new shopify.api.clients.Graphql({ session });
-  const time = currentDate(); 
+  const time = currentDate(req.timezone); 
   let count = 0;
   let error = false;
   let errorCount = 1;
@@ -19,7 +19,7 @@ export default async function productTagUpdate(session, req) {
     if (req.update === "replacetags") {
       for await (const product of products) {
         errorCount++;
-        const prod_sku = product.sku.replace("'","");
+        const prod_sku = product.sku.replace(/^'/,"");
         const prod = skuMap[`${prod_sku}`];
         if (!prod) {
           await updateStatus({ "store_name": storeName, "start_time": time, "error": `SKU not found or wrong SKU at line ${errorCount}` });
@@ -44,13 +44,13 @@ export default async function productTagUpdate(session, req) {
                   }`,
         });
       };
-      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "status": error ? 'Some Fields Ignored' : 'Success' });
+      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "finish_time": currentDate(req.timezone), "status": error ? 'Some Fields Ignored' : 'Success' });
       await updateRunning({"store_name": storeName, "running": 0});
     }
     else if (req.update === "addtags") {
       for await (const product of products) {
         errorCount++;
-        const prod_sku = product.sku.replace("'","");
+        const prod_sku = product.sku.replace(/^'/,"");
         const prod = skuMap[`${prod_sku}`];
         if (!prod) {
           await updateStatus({ "store_name": storeName, "start_time": time, "error": `SKU not found or wrong SKU at line ${errorCount}` });
@@ -75,7 +75,7 @@ export default async function productTagUpdate(session, req) {
                   }`,
         });
       };
-      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "status": error ? 'Some Fields Ignored' : 'Success' });
+      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "finish_time": currentDate(req.timezone), "status": error ? 'Some Fields Ignored' : 'Success' });
       await updateRunning({"store_name": storeName, "running": 0});
     }
     else if (req.update === "deletetagfromall") {
@@ -83,12 +83,10 @@ export default async function productTagUpdate(session, req) {
       for await (const product of products){
         for (let key in productMap){
           errorCount++;
-          if (product.data) {
+          if (!product.data) {
             await updateStatus({ "store_name": storeName, "start_time": time, "error": `Tag not found at line ${errorCount}` });
             error = true;
             continue;
-          } else {
-            count++;
           }
           const prod = productMap[key];
           if (prod.tags.includes(product.data)) {
@@ -101,10 +99,11 @@ export default async function productTagUpdate(session, req) {
                           }
                       }`,
             });
+            count++;
           }
         };
       }
-      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "status": error ? 'Some Fields Ignored' : 'Success' });
+      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "finish_time": currentDate(req.timezone), "status": error ? 'Some Fields Ignored' : 'Success' });
       await updateRunning({"store_name": storeName, "running": 0});
     }
     else if (req.update === "replacefromall") {
@@ -116,9 +115,8 @@ export default async function productTagUpdate(session, req) {
             await updateStatus({ "store_name": storeName, "start_time": time, "error": `Tag not found at line ${errorCount}` });
             error = true;
             continue;
-          } else {
-            count++;
           }
+            
           const prod = productMap[key];
           if (prod.tags.includes(product.oldtags)) {
             const data = await client.query({
@@ -139,16 +137,17 @@ export default async function productTagUpdate(session, req) {
                           }
                       }`,
             });
+            count++;
           }
         };
       }
-      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "status": error ? 'Some Fields Ignored' : 'Success' });
+      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "finish_time": currentDate(req.timezone), "status": error ? 'Some Fields Ignored' : 'Success' });
       await updateRunning({"store_name": storeName, "running": 0});
     }
     else if (req.update === "deleteallfromsku") {
       for await (const product of products) {
         errorCount++;
-        const prod_sku = product.sku.replace("'","");
+        const prod_sku = product.data.replace(/^'/,"");
         const prod = skuMap[`${prod_sku}`];
         if (!prod) {
           await updateStatus({ "store_name": storeName, "start_time": time, "error": `SKU not found or wrong SKU at line ${errorCount}` });
@@ -167,13 +166,13 @@ export default async function productTagUpdate(session, req) {
                   }`,
         });
       };
-      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "status": error ? 'Some Fields Ignored' : 'Success' });
+      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "finish_time": currentDate(req.timezone), "status": error ? 'Some Fields Ignored' : 'Success' });
       await updateRunning({"store_name": storeName, "running": 0});
     }
   }
   catch (error) {
       console.log("product-tag-updator.js",error);
-      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "status":'Failed' });
+      await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "finish_time": currentDate(req.timezone), "status":'Failed' });
       await updateRunning({ "store_name": storeName, "running": 0 });
   }
 }

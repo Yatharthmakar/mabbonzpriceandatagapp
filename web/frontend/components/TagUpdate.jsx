@@ -130,7 +130,7 @@ export default function TagUpdate() {
                 complete: async (results) => {
                     const result = await fetchh('/api/updateTagProduct', {
                         method: 'PATCH',
-                        body: JSON.stringify({ "file": { "data": results.data, "name": file.name }, "update": radioValue }),
+                        body: JSON.stringify({ "file": { "data": results.data, "name": file.name }, "update": radioValue, "timezone": new Date().getTimezoneOffset()}),
                         headers: {
                             'Content-Type': 'application/json',
                         },
@@ -158,8 +158,8 @@ export default function TagUpdate() {
                 <RadioButton label="Replace all old tags with new tags through SKU" disabled={file} id="replacetags" checked={radioValue === 'replacetags'} onChange={handleRadioChange} />
                 <RadioButton label="Replace a specific tag with another tag from all products" disabled={file} checked={radioValue === 'replacefromall'} id="replacefromall" onChange={handleRadioChange} />
                 <RadioButton label="Add tags to existing tags through SKU" disabled={file} checked={radioValue === 'addtags'} id="addtags" onChange={handleRadioChange} />
-                <RadioButton label="Delete all tags through SKU" disabled={file} checked={radioValue === 'deleteallfromsku'} id="deleteallfromsku" onChange={handleRadioChange} />
-                <RadioButton label="Delete a specific tag from all products (Upload a single column CSV)" disabled={file} checked={radioValue === 'deletetagfromall'} id="deletetagfromall" onChange={handleRadioChange} />
+                <RadioButton label="Delete all tags through SKU (Upload a single column CSV containing SKUs)" disabled={file} checked={radioValue === 'deleteallfromsku'} id="deleteallfromsku" onChange={handleRadioChange} />
+                <RadioButton label="Delete a specific tag from all products (Upload a single column CSV containing tags)" disabled={file} checked={radioValue === 'deletetagfromall'} id="deletetagfromall" onChange={handleRadioChange} />
 
             </VerticalStack>
             {radioValue && uploadSection}

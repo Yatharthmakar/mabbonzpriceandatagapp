@@ -66,7 +66,7 @@ const setChats = async (data, session) => {
     const storeName = session.shop.replace('.myshopify.com','');
     console.log("set chats", storeName);
     const db = await chats();
-    await db.updateOne({ "name": storeName }, { $push: { "chats": { "message": data.message, "time": currentDate(), "sender": storeName } } });
+    await db.updateOne({ "name": storeName }, { $push: { "chats": { "message": data.message, "time": currentDate(data.timezone), "sender": storeName } } });
 };
 
 const updateRunning = async (data) => {
@@ -107,7 +107,7 @@ const updateStatus = async (data) => {
         }
         else {
             console.log("updated file status", data.store_name);
-            await db.updateOne({ "name": data.store_name, "logs.start_time": data.start_time }, { $set: { "logs.$.finish_time": currentDate(), "logs.$.status": data.status, "logs.$.count": data.count } });
+            await db.updateOne({ "name": data.store_name, "logs.start_time": data.start_time }, { $set: { "logs.$.finish_time": data.finish_time, "logs.$.status": data.status, "logs.$.count": data.count } });
         }
     } catch (err) {
         console.log("Mongo error", err);

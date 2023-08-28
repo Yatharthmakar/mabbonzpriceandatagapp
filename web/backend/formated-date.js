@@ -1,6 +1,8 @@
-export default function currentDate (){
+export default function currentDate (offset=-330){
     // Get the current date
-    let currentDate = new Date();
+    let date = new Date();
+    let utc = date.getTime() - (date.getTimezoneOffset() * 60000);
+    let currentDate = new Date(utc + (60000*offset));
 
     // Get the year, month, and day
     let year = currentDate.getFullYear();
