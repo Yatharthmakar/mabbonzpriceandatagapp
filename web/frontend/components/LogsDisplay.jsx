@@ -59,7 +59,7 @@ export default function LogsDisplay(props) {
                     <ResourceList
                         resourceName={{ singular: 'log', plural: 'logs' }}
                         items={logsData}
-                        emptyState={<EmptyState heading="Empty Logs: No file uploaded recently" image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"><p>Try refreshing the page!</p></EmptyState>}
+                        emptyState={<EmptyState heading="Empty Logs: No file uploaded recently" image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"><Text variant="headingLg" as="h5">Try refreshing the page!</Text></EmptyState>}
                         renderItem={(item) => {
                             const { start_time, finish_time, file_name, status, update } = item;
                             const sTime = start_time.substring(0, 19);

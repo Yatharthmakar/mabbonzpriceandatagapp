@@ -105,6 +105,10 @@ const updateStatus = async (data) => {
             console.log("update error", data.store_name);
             await db.updateOne({ "name": data.store_name, "logs.start_time": data.start_time }, { $set: { "logs.$.count": data.count }, $inc: { "logs.$.error.count": 1 }, $push: { "logs.$.error.message": data.error } });
         }
+        else if (data.update){
+            console.log("update count", data.store_name);
+            await db.updateOne({ "name": data.store_name, "logs.start_time": data.start_time }, { $set: { "logs.$.count": data.count }});
+        }
         else {
             console.log("updated file status", data.store_name);
             await db.updateOne({ "name": data.store_name, "logs.start_time": data.start_time }, { $set: { "logs.$.finish_time": data.finish_time, "logs.$.status": data.status, "logs.$.count": data.count } });

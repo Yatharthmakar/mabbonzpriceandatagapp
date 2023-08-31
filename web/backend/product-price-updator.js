@@ -21,6 +21,7 @@ productVariantUpdate($input: ProductVariantInput!) {
 
 export default async function productPriceUpdate(session, req) {
   const storeName = session.shop.replace('.myshopify.com', '');
+
   console.log('Price Update', storeName);
   const client = new shopify.api.clients.Graphql({ session });
   const time = currentDate(req.timezone);
@@ -37,7 +38,7 @@ export default async function productPriceUpdate(session, req) {
     for await (const product of products) {
       if (product.sku != '' && product.price != '') {
         errorCount++;
-        const prod_sku = product.sku.replace(/^'/,"");
+        const prod_sku = product.sku.replace(/^'/, "");
         const variant = skuMap[`${prod_sku}`];
         let price = Number(product.price);
         if (!variant) {
@@ -79,6 +80,9 @@ export default async function productPriceUpdate(session, req) {
             },
           },
         });
+        if (count % 100 === 0) {
+          await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "update": "yes" });
+        }
       }
     };
     await updateStatus({ "store_name": storeName, "start_time": time, "count": count, "finish_time": currentDate(req.timezone), "status": error ? 'Some Fields Ignored' : 'Success' });

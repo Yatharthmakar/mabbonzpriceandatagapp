@@ -66,7 +66,7 @@ export default function PriceUpdate() {
         </DropZone>
       </div>
       <div>
-        <Button disabled={!file} onClick={() => { setFile(''); setRadioValue(''); setSelect1(''); setSelect2(''); setColumnNames([]); setCsvData(''); setAmountValue(''); setPercentageValue(''); setErrorMessage('') }} destructive>Reset</Button>
+        <Button disabled={!file} onClick={() => { setFile(''); setRadioValue(''); setSelect1(''); setSelect2(''); setColumnNames([]); setCsvData(''); setAmountValue(''); setPercentageValue(''); setErrorMessage(''); setIsLoading(false); }} destructive>Reset</Button>
       </div>
     </LegacyStack>
   );
@@ -94,7 +94,12 @@ export default function PriceUpdate() {
     </div>
   );
 
+  const clearError = ()=>{
+    setErrorMessage('');
+}
+
   const handleSubmit = async () => {
+    clearError();
     setIsLoading(true);
     const response = await fetchh('/api/getRunningstatus');
     const result = await response.json();
@@ -105,14 +110,17 @@ export default function PriceUpdate() {
       csvDataUplaod.push(['sku', 'price']);
       const column1 = csvData.map((row) => row[select1]);
       const column2 = csvData.map((row) => row[select2]);
-      let count;
-      for (count = 0; count < column1.length; count++) {
+
+      if (column1.length > 2000) {
+        setErrorMessage("Number of products should be less than or equal to 2000.");
+        setIsLoading(false);
+        return;
+    }
+
+      for (let count = 0; count < column1.length; count++) {
         csvDataUplaod.push([column1[count], column2[count]]);
       }
-      if (count > 2000) {
-        setErrorMessage("Number of products should be less than or equal to 2000.");
-        return;
-      }
+
       csvDataUplaod = Papa.unparse(csvDataUplaod);
       Papa.parse(csvDataUplaod, {
         header: true,

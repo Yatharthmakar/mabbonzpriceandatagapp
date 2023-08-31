@@ -1,8 +1,8 @@
 export default function currentDate (offset=-330){
     // Get the current date
     let date = new Date();
-    let utc = date.getTime() - (date.getTimezoneOffset() * 60000);
-    let currentDate = new Date(utc + (60000*offset));
+    let utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+    let currentDate = new Date(utc - (60000*offset));
 
     // Get the year, month, and day
     let year = currentDate.getFullYear();
@@ -15,7 +15,7 @@ export default function currentDate (offset=-330){
     let seconds = String(currentDate.getSeconds()).padStart(2, '0');
 
     // Get the time zone offset in minutes
-    let timezoneOffsetMinutes = currentDate.getTimezoneOffset();
+    let timezoneOffsetMinutes = 60000*offset;
 
     // Convert the time zone offset to the format "+HH:mm"
     let timezoneOffsetHours = Math.floor(Math.abs(timezoneOffsetMinutes) / 60);

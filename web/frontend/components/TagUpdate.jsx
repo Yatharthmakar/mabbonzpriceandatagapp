@@ -64,7 +64,7 @@ export default function TagUpdate() {
                 </DropZone>
             </div>
             <div>
-                <Button disabled={!file} onClick={() => { setFile(''); setRadioValue(''); setSelect1(''); setSelect2(''); setColumnNames([]); setCsvData(''); setErrorMessage('') }} destructive>Reset</Button>
+                <Button disabled={!file} onClick={() => { setFile(''); setRadioValue(''); setSelect1(''); setSelect2(''); setColumnNames([]); setCsvData(''); setErrorMessage(''); setIsLoading(false);}} destructive>Reset</Button>
             </div>
         </LegacyStack>
     );
@@ -92,12 +92,15 @@ export default function TagUpdate() {
         </div>
     );
 
+    const clearError = ()=>{
+        setErrorMessage('');
+    }
+
     const handleSubmit = async () => {
+        clearError();
         setIsLoading(true);
         const response = await fetchh('/api/getRunningstatus');
         const result = await response.json();
-        console.log("running",result);
-
         if (!result) {
             let csvDataUplaod = [];
             if (radioValue === "replacetags" || radioValue === "replacefromall" || radioValue === "addtags") {
@@ -109,22 +112,33 @@ export default function TagUpdate() {
                 }
                 const column1 = csvData.map((row) => row[select1]);
                 const column2 = csvData.map((row) => row[select2]);
-                let count;
-                for (count = 0; count < column1.length; count++) {
-                    csvDataUplaod.push([column1[count], column2[count]]);
-                }
-                if (count > 2000) {
+                
+                if (column1.length > 2000) {
                     setErrorMessage("Number of products should be less than or equal to 2000.");
+                    setIsLoading(false);
                     return;
                 }
+
+                for (let count = 0; count < column1.length; count++) {
+                    csvDataUplaod.push([column1[count], column2[count]]);
+                }
+                
             } else {
                 csvDataUplaod.push(["data"]);
                 const column = csvData.map((row) => row[columnNames[0]]);
-                for (let i = 0; i < column.length; i++) {
+
+                if (column.length > 2000) {
+                    setErrorMessage("Number of products should be less than or equal to 2000.");
+                    setIsLoading(false);
+                    return;
+                }
+
+                for (let count = 0; count < column.length; count++) {
                     csvDataUplaod.push([column[i]]);
                 }
             }
             csvDataUplaod = Papa.unparse(csvDataUplaod);
+
             Papa.parse(csvDataUplaod, {
                 header: true,
                 complete: async (results) => {
