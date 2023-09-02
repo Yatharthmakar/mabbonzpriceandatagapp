@@ -69,6 +69,19 @@ const setChats = async (data, session) => {
     await db.updateOne({ "name": storeName }, { $push: { "chats": { "message": data.message, "time": currentDate(data.timezone), "sender": storeName } } });
 };
 
+const deleteChats = async(session)=>{
+    try {
+        const storeName = session.shop.replace('.myshopify.com', '');
+        console.log('Deleted chats', storeName);
+        const db = await chats();
+
+        await db.updateOne({ "name": storeName }, { $set: { "chats": [] } });
+    }
+    catch (err) {
+        console.log("Mongo error", err);
+    }
+}
+
 const updateRunning = async (data) => {
     try {
         console.log("running update", data.running, data.store_name);
@@ -160,16 +173,17 @@ const getProductMap = async (storeName) => {
     return response[0].product_sku;
 };
 
-const insertUserData = async (data) => {
+const insertUserData = async (data, session) => {
+    const storeName = session.shop.replace('.myshopify.com', '');
     const db = await userData();
     const response = await db.find({ "store_data.name": data.name }).toArray();
     if (response.length === 0) {
         console.log("inserted user data", data.name);
-        await db.insertOne({ "store_data": data, "installed_at": currentDate(), "last_used": currentDate(), "uninstalled_at": "-" });
+        await db.insertOne({ "store_data": data, "storeName": storeName, "installed_at": currentDate(), "last_used": currentDate(), "uninstalled_at": "-" });
     } else {
         console.log("updated user data", data.name);
-        await db.updateOne({ "store_data.name": data.name }, { $set: { last_used: currentDate(), "uninstalled_at": "-" } });
+        await db.updateOne({ "store_data.name": data.name }, { $set: { "storeName": storeName, last_used: currentDate(), "uninstalled_at": "-" } });
     }
 };
 
-export { insertUserData, setSkuMap, getSkuMap, getProductMap, updateStatus, getLogs, deleteLogs, deleteLog, updateRunning, getRunning, updateUninstall, getChats, setChats };
+export { insertUserData, setSkuMap, getSkuMap, getProductMap, updateStatus, getLogs, deleteLogs, deleteLog, updateRunning, getRunning, updateUninstall, getChats, setChats, deleteChats };

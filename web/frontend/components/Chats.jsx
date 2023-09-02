@@ -58,6 +58,16 @@ export default function Chats() {
         setIsLoading(false);
     };
 
+    const deleteChats = async()=>{
+        setIsLoading(true);
+        const response = await fetchh('/api/deleteChats',{
+            method: 'DELETE'
+        });
+        await getChats();
+        setMessages([]);
+        setIsLoading(false)
+    }
+
     const loadingMarkup = isLoading ? (
         <LegacyCard>
             <Frame>
@@ -69,7 +79,7 @@ export default function Chats() {
     return (
         <Page narrowWidth title='Chat with app Admin'>
             {loadingMarkup}
-            {!isLoading && <LegacyCard actions={[{ content: 'Refresh Chats', onAction: getChats }]}>
+            {!isLoading && <LegacyCard actions={[{ content: 'Refresh Chats', onAction: getChats }, { content: 'Delete Chats', onAction: deleteChats, destructive: true }]}>
                 <div className='box' ref={chatWindowRef}>
                     {messages?.map((message) => {
                         return (

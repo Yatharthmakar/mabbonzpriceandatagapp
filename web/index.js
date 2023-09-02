@@ -8,7 +8,7 @@ import productTagUpdate from "./backend/product-tag-updator.js";
 import productFetchor from "./backend/product-fetch.js";
 import productPriceUpdate from "./backend/product-price-updator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
-import { insertUserData, getLogs, deleteLogs, deleteLog, getRunning, updateRunning, getChats, setChats } from "./backend/dbConnection.js";
+import { insertUserData, getLogs, deleteLogs, deleteLog, getRunning, updateRunning, getChats, setChats, deleteChats } from "./backend/dbConnection.js";
 // import addUninstallWebhookHandler from "./webhooks/appUinstall.js";
 
 
@@ -55,7 +55,7 @@ app.use(express.urlencoded({limit: '10mb', extended: true}));
 app.get("/api/fetchStoreData", async (_req, res) => {
   try {
     const storeData = await shopify.api.rest.Shop.all({ session: res.locals.shopify.session });
-    await insertUserData(storeData.data[0]);
+    await insertUserData(storeData.data[0], res.locals.shopify.session);
     // console.log("store info", storeData.data);
     res.status(200).send({ "response": "Success" });
   }
@@ -114,7 +114,7 @@ app.delete("/api/deleteLogs", async (_req, res) => {
     res.sendStatus(200);
   }
   catch (err) {
-    console.log("Failed logs refresh fetch", err);
+    console.log("Error deleting all log", err);
   }
 });
 
@@ -125,6 +125,16 @@ app.delete("/api/deleteLog", async (_req, res) => {
   }
   catch (err) {
     console.log("Error deleting log", err)
+  }
+});
+
+app.delete("/api/deleteChats", async (_req, res) => {
+  try {
+    deleteChats(res.locals.shopify.session);
+    res.sendStatus(200);
+  }
+  catch (err) {
+    console.log("Error deleting chats", err);
   }
 });
 
