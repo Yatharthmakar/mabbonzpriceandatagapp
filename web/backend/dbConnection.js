@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb";
 import currentDate from "./formated-date.js";
-const url = "";
+const url = "mongodb+srv://ranbirr314:gszC63K4Ytrl1Ogn@cluster0.na64i4d.mongodb.net/?retryWrites=true&w=majority";
 const mdbclient = new MongoClient(url);
 
 async function userData() {
